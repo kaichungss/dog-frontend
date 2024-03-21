@@ -1,0 +1,21 @@
+.login {
+  background-image: url('/src/assets/login.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+}
+
+.register {
+  text-align: right;
+}
+
+.register > a {
+  color: gray;
+  text-decoration: none;
+}
+
+.title {
+  text-align: center;
+}
