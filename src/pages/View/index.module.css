@@ -1,40 +1,9 @@
-.img {
+.view {
+  background-color: #f8f8f8;
   padding: 10px;
 }
 
-.item {
-  display: flex;
-  background-color: white;
-  border: 1px solid;
-  border-radius: 10px;
-}
-
-.left {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-
-.right {
-  padding: 10px;
-  position: relative;
-  flex: 1;
-}
-
-.right > div {
-  margin-bottom: 10px;
-}
-
-.item img {
-  border-radius: 10px;
-  width: 150px;
-  height: 150px;
-}
-
-.number {
+.more {
   width: 100%;
-  display: flex;
-  justify-content: space-around;
-  position: absolute;
-  bottom: 0;
+  text-align: center;
 }

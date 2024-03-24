@@ -1,0 +1,45 @@
+.img {
+  padding: 10px;
+}
+
+.item {
+  display: flex;
+  background-color: white;
+  border: 1px solid;
+  border-radius: 10px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.right {
+  padding: 10px;
+  position: relative;
+  flex: 1;
+}
+
+.describe {
+  height: 100px;
+  overflow: scroll;
+}
+
+.item img {
+  border-radius: 10px;
+  width: 150px;
+  height: 150px;
+}
+
+.number {
+  width: 100%;
+  display: flex;
+  position: absolute;
+  bottom: 10px;
+}
+
+.number > div {
+  flex: 1;
+  text-align: center;
+}

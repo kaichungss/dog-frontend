@@ -7,6 +7,7 @@ import { httpPost } from '../../api/request';
 
 interface Token {
   token: string;
+  username: string;
 }
 
 const Login: React.FC = () => {
@@ -29,9 +30,10 @@ const Login: React.FC = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.stopPropagation();
     const data = await httpPost<Token>("/login", formData);
-    if (data != null) {
+    if (data) {
       localStorage.setItem("accessToken", data.token);
-      navigate("/system/view")
+      localStorage.setItem("username", data.username);
+      navigate("/system")
     }
   }
   const toggleShowPassword = () => {

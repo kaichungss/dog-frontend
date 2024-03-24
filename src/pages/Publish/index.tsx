@@ -1,37 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, InputGroup, Modal, Pagination, Row, Table } from 'react-bootstrap';
-import { httpGet, httpPost } from "../../api/request";
 import './index.module.css'
-
-interface Item {
-  id: number;
-  name: string;
-  describe: string;
-  image: string;
-}
-
-interface ItemList {
-  id: number;
-  name: string;
-  describe: string;
-  image: string;
-  update_time: Date;
-}
-
-interface List {
-  count: number;
-  list: ItemList[];
-}
-
-
-const initialItem: Item = {
-  id: 0,
-  name: '',
-  describe: '',
-  image: ''
-};
-
-const ITEMS_PER_PAGE = 2;
+import { deleteData, initialItem, Item, ITEMS_PER_PAGE, List, list, save } from "../../api/publish";
+import { upload } from "../../api/file";
 
 const Publish: React.FC = () => {
   const [items, setItems] = useState<List>({count: 0, list: []});
@@ -47,9 +18,10 @@ const Publish: React.FC = () => {
   useEffect(() => {
     search();
   }, [currentPage])
+
   const search = async () => {
-    const data = await httpPost<List>("/system/list", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});
-    if (data != null) {
+    const data = await list(currentPage, searchName);
+    if (data) {
       setItems(data)
     }
   };
@@ -67,33 +39,27 @@ const Publish: React.FC = () => {
   };
 
   const handleSave = async () => {
-    const endpoint = currentItem.id ? "/system/update" : "/system/insert";
-    currentItem.image = encodeURIComponent(currentItem.image);
-    const data = await httpPost<string>(endpoint, currentItem);
-    if (data != null) {
-      handleClose();
-      search();
+    const data = await save(currentItem);
+    if (data) {
+      window.location.reload();
     }
   }
 
   const handleDelete = async (id: number) => {
-    await httpGet<string>("/system/delete", {id});
-    search();
+    await deleteData(id);
+    window.location.reload();
   };
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        if (reader.result) {
-          currentItem.image = String(reader.result);
-          setCurrentItem(currentItem)
-        }
-      };
+      const fileVal = await upload(file);
+      if (fileVal) {
+        currentItem.image = fileVal;
+        setCurrentItem(currentItem)
+      }
     }
   };
 
@@ -129,7 +95,7 @@ const Publish: React.FC = () => {
           <tr key={item.id}>
             <td>{item.name}</td>
             <td>{item.describe}</td>
-            <td><img src={item.image} alt={item.name} style={{width: "40px"}}/></td>
+            <td><img src={process.env.REACT_APP_BASE_URL+'/' + item.image} alt={item.name} style={{width: "40px"}}/></td>
             <td>
               <Button variant="primary" onClick={() => handleShowModal(item)}>
                 Edit

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom"
+import { createBrowserRouter, Navigate } from "react-router-dom"
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import System from "../pages/System";
@@ -10,7 +10,7 @@ import View from "../pages/View";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login/>,
+    element: <Navigate to="/login" replace/>,
   },
   {
     path: "/login",
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',
-        element: <View/>
+        element: <Navigate to="/system/view" replace/>,
       },
       {
         path: 'view',

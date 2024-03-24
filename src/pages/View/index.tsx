@@ -1,80 +1,103 @@
 import React, { useEffect, useState } from 'react';
-import { ListGroup } from 'react-bootstrap';
+import { Button, Form, ListGroup, Modal } from 'react-bootstrap';
 import { FixedSizeList as List } from 'react-window';
+import Item, { ItemData } from "../../components/Item";
+import Comment, { CommentData } from "../../components/Comment";
 import styles from "./index.module.css";
-import { httpPost } from "../../api/request";
+import { addComment, clickData, commentList, list, ListData } from '../../api/view';
 
-interface ItemList {
-  id: number;
-  name: string;
-  describe: string;
-  image: string;
-  update_time: Date;
-}
-
-interface ListData {
-  count: number;
-  list: ItemList[];
-}
-
-const ITEMS_PER_PAGE = 20;
 const VirtualList: React.FC = () => {
   const [items, setItems] = useState<ListData>({count: 0, list: []});
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentItem, setCurrentItem] = useState<ItemData>();
   const [searchName, setSearchName] = useState<string>('');
-
+  const [comments, setComments] = useState<CommentData[]>([]);
+  const [newComment, setNewComment] = useState<string>('');
+  const [showModal, setShowModal] = useState<boolean>(false);
   useEffect(() => {
     search();
   }, [currentPage])
 
   const search = async () => {
-    const data = await httpPost<ListData>("/system/list", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});
-    if (data != null) {
-      setItems(data)
+    const data = await list(currentPage, searchName);
+    if (data) {
+      setItems({count: data.count, list: items.list.concat(data.list)})
     }
   };
 
   const clickDom = async (dog_id: number) => {
-    const data = await httpPost("/system/click", {dog_id});
-    if (data != null) {
-
+    setShowModal(true)
+    items.list.map((item) => {
+      if (item.id === dog_id) {
+        item.click_num += 1;
+        setCurrentItem({...item, click_num: 0, comment_num: 0})
+      }
+    })
+    setItems(items);
+    await clickData(dog_id);
+    const commentData = await commentList(dog_id)
+    if (commentData != null) {
+      setComments(commentData);
     }
   };
 
-
-
   const RowComponent: React.FC<{ index: number, style: React.CSSProperties }> = ({index, style}) => (
-    <div style={style}>
-      <ListGroup.Item style={{padding: "10px"}}>
-        <div className={styles.item}>
-          <div className={styles.left}>
-            <img src={items.list[index].image} alt={items.list[index].name}/>
-          </div>
-          <div className={styles.right}>
-            <div>{items.list[index].name}</div>
-            <div>{items.list[index].describe}</div>
-            <div className={styles.number}>
-              <div>uploader：tony</div>
-              <>uploadTime：{new Date(items.list[index].update_time).toLocaleString()}</>
-              <div>comments number：1111</div>
-              <div onClick={() => clickDom(items.list[index].id)}>click number: 50</div>
-            </div>
-          </div>
-        </div>
+    <div style={style} className={styles.row}>
+      <ListGroup.Item style={{padding: "10px"}} onClick={() => clickDom(items.list[index].id)}>
+        <Item data={items.list[index]}/>
       </ListGroup.Item>
+      {index == items.list.length - 1 && items.list.length != items.count &&
+        <div onClick={() => setCurrentPage(currentPage + 1)} className={styles.more}>load more</div>}
     </div>
   );
+  const handleCommentSubmit = () => {
+    if (newComment.trim() !== '') {
+      comments.unshift({comment: newComment, username: localStorage.getItem("username") || '', insert_time: new Date()})
+      setComments(comments);
+      items.list.map((item) => {
+        if (item.id === currentItem?.id) {
+          item.comment_num += 1;
+        }
+      })
+      setItems(items);
+      setNewComment('');
+      addComment(currentItem?.id || 0, newComment)
+    }
+  };
+  const handleCommentChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+    setNewComment(e.target.value);
+  };
 
   return (
-    <List
-      height={window.innerHeight}
-      itemCount={items.count}
-      itemSize={200}
-      width={'100%'}
-      style={{backgroundColor: "#f8f8f8", padding: "10px", height: "20%"}}
-    >
-      {({index, style}) => <RowComponent index={index} style={style}/>}
-    </List>
+    <div className={styles.view}>
+      <List
+        height={window.innerHeight - 80}
+        itemCount={items.list.length}
+        itemSize={200}
+        width={'100%'}
+      >
+        {({index, style}) => <RowComponent index={index} style={style}/>}
+      </List>
+      <Modal show={showModal} size={"xl"} onHide={() => setShowModal(false)}>
+        <div style={{padding: "20px"}}>
+          {currentItem && <Item data={currentItem} showNum={false}/>}
+          <Form style={{marginTop: "10px"}}>
+            <Form.Group controlId="formComment" className="mb-3">
+              <Form.Label>leave a comment</Form.Label>
+              <Form.Control as="textarea" rows={3} value={newComment} onChange={handleCommentChange}/>
+            </Form.Group>
+            <Button variant="primary" onClick={handleCommentSubmit}>
+              submit
+            </Button>
+          </Form>
+          <ListGroup>
+            {comments.map((comment, index) => (
+              <Comment data={comment}/>
+            ))}
+          </ListGroup>
+        </div>
+      </Modal>
+    </div>
   );
 };
 

@@ -56,7 +56,7 @@ const Register: React.FC = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.stopPropagation();
     const data = await httpPost<string>("/register/insert", formData);
-    if (data != null) {
+    if (data) {
       alert("success")
       navigate("/login")
     }
@@ -65,7 +65,7 @@ const Register: React.FC = () => {
     event.stopPropagation();
     setDisabled(true);
     const data = await httpPost<string>("/register/code", {email: formData.email});
-    if (data != null) {
+    if (data) {
       alert("registration code:" + data)
     }
   }
