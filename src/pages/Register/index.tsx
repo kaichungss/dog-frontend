@@ -3,7 +3,7 @@ import { Button, Form, InputGroup } from 'react-bootstrap';
 import Box from '../../components/Box';
 import styles from "./index.module.css";
 import { useNavigate } from 'react-router-dom';
-import { httpPost } from '../../api/request';
+import { registerCode, registerInsert } from "../../api/register";
 
 
 const Register: React.FC = () => {
@@ -55,16 +55,15 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (event: FormEvent) => {
     event.stopPropagation();
-    const data = await httpPost<string>("/register/insert", formData);
+    const data = await registerInsert(formData);
     if (data) {
-      alert("success")
       navigate("/login")
     }
   }
   const sendCode = async (event: FormEvent) => {
     event.stopPropagation();
     setDisabled(true);
-    const data = await httpPost<string>("/register/code", {email: formData.email});
+    const data = registerCode(formData.email);
     if (data) {
       alert("registration code:" + data)
     }

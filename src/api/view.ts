@@ -9,10 +9,14 @@ export interface ListData {
   list: ItemData[];
 }
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 2;
 
 export const list = async (currentPage: number, searchName: string) => {
   return await httpPost<ListData>(URI + "list", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});
+};
+
+export const moreList = async (currentPage: number, searchName: string) => {
+  return await httpPost<ItemData>(URI + "moreList", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});
 };
 
 export const clickData = async (dog_id: number) => {
