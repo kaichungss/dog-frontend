@@ -2,7 +2,20 @@ td {
   vertical-align: middle;
 }
 
+tr td:nth-child(1) {
+  width: 10%;
+}
 
 tr td:nth-child(2) {
+  width: 10%;
+}
+
+tr td:nth-child(3) {
   width: 60%;
+}
+
+tr td > div {
+  max-height: 100px;
+  overflow: scroll;
+  word-break: break-all;
 }

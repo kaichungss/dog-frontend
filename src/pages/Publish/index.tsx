@@ -5,8 +5,11 @@ import { deleteData, initialItem, Item, ITEMS_PER_PAGE, List, list, save } from 
 import { upload } from "../../api/file";
 
 const Publish: React.FC = () => {
+  // table info
   const [items, setItems] = useState<List>({count: 0, list: []});
+  // search input
   const [searchName, setSearchName] = useState<string>('');
+  // add update modal
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentItem, setCurrentItem] = useState<Item>(initialItem);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -38,6 +41,7 @@ const Publish: React.FC = () => {
     });
   };
 
+  // save info
   const handleSave = async () => {
     const data = await save(currentItem);
     if (data) {
@@ -45,13 +49,18 @@ const Publish: React.FC = () => {
     }
   }
 
+  // delete data
   const handleDelete = async (id: number) => {
     await deleteData(id);
     window.location.reload();
   };
+
+  // pagination
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+
+  // upload the file
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
@@ -64,7 +73,7 @@ const Publish: React.FC = () => {
   };
 
   return (
-    <div className="view container mt-3">
+    <div className="view  mt-3" style={{paddingLeft: "20px"}}>
       <Row className="d-flex justify-content-between align-items-center">
         <Col md={3} className="mb-3">
           <InputGroup>
@@ -85,6 +94,7 @@ const Publish: React.FC = () => {
         <thead>
         <tr>
           <th>Name</th>
+          <th>Breed</th>
           <th>Describe</th>
           <th>Image</th>
           <th>Actions</th>
@@ -93,9 +103,17 @@ const Publish: React.FC = () => {
         <tbody>
         {items.list.map((item) => (
           <tr key={item.id}>
-            <td>{item.name}</td>
-            <td>{item.describe}</td>
-            <td><img src={process.env.REACT_APP_BASE_URL+'/' + item.image} alt={item.name} style={{width: "40px"}}/></td>
+            <td>
+              <div>{item.name}</div>
+            </td>
+            <td>
+              <div>{item.breed}</div>
+            </td>
+            <td>
+              <div>{item.describe}</div>
+            </td>
+            <td><img src={process.env.REACT_APP_BASE_URL + '/' + item.image} alt={item.name} style={{width: "40px"}}/>
+            </td>
             <td>
               <Button variant="primary" onClick={() => handleShowModal(item)}>
                 Edit
@@ -130,6 +148,11 @@ const Publish: React.FC = () => {
               <Form.Label>Name</Form.Label>
               <Form.Control type="text" placeholder="Enter name" name="name"
                             value={currentItem.name} onChange={handleInputChange}/>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formName">
+              <Form.Label>Breed</Form.Label>
+              <Form.Control type="text" placeholder="Enter Breed" name="breed"
+                            value={currentItem.breed} onChange={handleInputChange}/>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formDescription">
               <Form.Label>describe</Form.Label>

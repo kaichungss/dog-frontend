@@ -5,7 +5,7 @@ import System from "../pages/System";
 import NotFund from "../pages/Error/notFund";
 import Publish from "../pages/Publish";
 import View from "../pages/View";
-
+import Favorites from "../pages/Favorites";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: 'view',
         element: <View/>
+      },
+      {
+        path: 'favorites',
+        element: <Favorites/>
       },
       {
         path: 'publish',

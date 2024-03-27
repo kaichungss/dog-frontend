@@ -8,6 +8,7 @@ import { registerCode, registerInsert } from "../../api/register";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  // countdown
   const time = 60;
   const [seconds, setSeconds] = useState<number>(time);
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -26,9 +27,9 @@ const Register: React.FC = () => {
       [name]: value
     });
   };
+  // identity switching
   const handleCheckboxChange = (e: { target: { name: any; checked: any; }; }) => {
     const {name, checked} = e.target;
-    console.log(checked)
     const role = checked ? 'worker' : 'public';
     setFormData({
       ...formData,
@@ -63,7 +64,7 @@ const Register: React.FC = () => {
   const sendCode = async (event: FormEvent) => {
     event.stopPropagation();
     setDisabled(true);
-    const data = registerCode(formData.email);
+    const data = await registerCode(formData.email);
     if (data) {
       alert("registration code:" + data)
     }
@@ -111,13 +112,15 @@ const Register: React.FC = () => {
               onChange={handleCheckboxChange}
             />
           </Form.Group>
-          <InputGroup className="mb-3">
-            <Form.Control placeholder="registration code" name="code" value={formData.code}
-                          onChange={handleInputChange}/>
-            <Button variant="outline-secondary" id="send-registration" onClick={sendCode} disabled={disabled}>
-              {disabled ? `${seconds} seconds click` : 'send'}
-            </Button>
-          </InputGroup>
+          {formData.role === 'worker' &&
+            <InputGroup className="mb-3">
+              <Form.Control placeholder="registration code" name="code" value={formData.code}
+                            onChange={handleInputChange}/>
+              <Button variant="outline-secondary" id="send-registration" onClick={sendCode} disabled={disabled}>
+                {disabled ? `${seconds} seconds click` : 'send'}
+              </Button>
+            </InputGroup>
+          }
           <div className="d-flex justify-content-center">
             <Button variant="primary" type="button" onClick={handleSubmit}>
               register

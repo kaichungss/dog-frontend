@@ -4,8 +4,8 @@ import { FixedSizeList as List } from 'react-window';
 import Item, { ItemData } from "../../components/Item";
 import Comment, { CommentData } from "../../components/Comment";
 import styles from "./index.module.css";
-import { addComment, clickData, commentList, deleteComment, list, ListData, moreList } from '../../api/view';
-import { addFavorites } from '../../api/favorites';
+import { addComment, clickData, commentList, deleteComment, ListData } from '../../api/view';
+import { addFavorites, list, moreList } from '../../api/favorites';
 
 const VirtualList: React.FC = () => {
   // home data
@@ -56,19 +56,9 @@ const VirtualList: React.FC = () => {
   };
   const favorite = async (e: FormEvent, f: boolean, dog_id: number) => {
     e.stopPropagation();
-    items.list.map((item) => {
-      if (item.id === dog_id) {
-        if (f) {
-          item.is_collected = 1;
-        } else {
-          item.is_collected = 0;
-        }
-        setCurrentItem({...item})
-      }
-      return item;
-    })
-    setItems({...items});
+    setShowModal(false)
     await addFavorites(f, dog_id);
+    await search();
   }
 
   const RowComponent: React.FC<{ index: number, style: React.CSSProperties }> = ({index, style}) => (

@@ -1,0 +1,13 @@
+.system {
+  height: 100%;
+}
+
+.navbar {
+  padding-left: 10px;
+}
+
+.out {
+  height: calc(100% - 60px);
+  overflow: scroll;
+  word-break: break-all;
+}

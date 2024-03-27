@@ -8,10 +8,12 @@ import { httpPost } from '../../api/request';
 interface Token {
   token: string;
   username: string;
+  role: string;
 }
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  // display the password
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -20,6 +22,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     localStorage.clear();
   }, [])
+  // input info changes
   const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
     const {name, value} = e.target;
     setFormData({
@@ -27,12 +30,14 @@ const Login: React.FC = () => {
       [name]: value
     });
   };
+  // submit
   const handleSubmit = async (event: FormEvent) => {
     event.stopPropagation();
     const data = await httpPost<Token>("/login", formData);
     if (data) {
-      localStorage.setItem("accessToken", data.token);
+      localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
+      localStorage.setItem("role", data.role);
       navigate("/system")
     }
   }

@@ -1,15 +1,15 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { Response } from "../type/response";
 
-
+// axios config
 const instance = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL
 });
 
 instance.interceptors.request.use(function (config) {
-  let accessToken = localStorage.getItem("accessToken");
-  if (accessToken) {
-    config.headers["Authorization"] = `${accessToken}`;
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers["Token"] = token;
   }
   return config;
 }, function (error) {

@@ -1,10 +1,23 @@
 .comments {
   margin: 10px;
   padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.left {
+  flex: 1;
+  margin-right: 10px;
   border-bottom: gray solid 1px;
 }
 
 .head {
   display: flex;
   justify-content: space-between;
+}
+
+.comment {
+  max-height: 100px;
+  word-break: break-all;
+  overflow: scroll;
 }

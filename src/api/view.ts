@@ -9,8 +9,12 @@ export interface ListData {
   list: ItemData[];
 }
 
-const ITEMS_PER_PAGE = 2;
+export interface CommentInsertResult {
+  insertId: number;
+}
 
+const ITEMS_PER_PAGE = 5;
+// home page information interface
 export const list = async (currentPage: number, searchName: string) => {
   return await httpPost<ListData>(URI + "list", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});
 };
@@ -28,7 +32,12 @@ export const commentList = async (dog_id: number) => {
 };
 
 export const addComment = async (dog_id: number, comment: string) => {
-  return await httpPost(URI + 'comment', {dog_id, comment})
-
+  return await httpPost<CommentInsertResult>(URI + 'comment', {dog_id, comment})
 };
+
+export const deleteComment = async (id: number) => {
+  return await httpPost<string>(URI + 'delete_comment', {id})
+};
+
+
 
