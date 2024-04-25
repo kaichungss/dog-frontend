@@ -1,11 +1,11 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import { Button, Col, Form, InputGroup, ListGroup, Modal, Row } from 'react-bootstrap';
-import { FixedSizeList as List } from 'react-window';
 import Item, { ItemData } from "../../components/Item";
 import Comment, { CommentData } from "../../components/Comment";
 import styles from "./index.module.css";
 import { addComment, clickData, commentList, deleteComment, list, ListData, moreList } from '../../api/view';
 import { addFavorites } from '../../api/favorites';
+import NoDataPage from "../../components/NoDataPage";
 
 const VirtualList: React.FC = () => {
   // home data
@@ -38,8 +38,7 @@ const VirtualList: React.FC = () => {
     }
   };
 
-  const clickDom = async (dog_id: number) => {
-    setShowModal(true)
+  const clickP = async (dog_id: number) => {
     items.list.map((item) => {
       if (item.id === dog_id) {
         item.click_num += 1;
@@ -49,6 +48,10 @@ const VirtualList: React.FC = () => {
     })
     setItems(items);
     await clickData(dog_id);
+  };
+
+  const comment = async (dog_id: number) => {
+    setShowModal(true)
     const commentData = await commentList(dog_id)
     if (commentData != null) {
       setComments(commentData);
@@ -71,12 +74,18 @@ const VirtualList: React.FC = () => {
     await addFavorites(f, dog_id);
   }
 
-  const RowComponent: React.FC<{ index: number, style: React.CSSProperties }> = ({index, style}) => (
-    <div style={style} className={styles.row}>
-      <ListGroup.Item style={{padding: "15px"}} onClick={() => clickDom(items.list[index].id)} key={index}>
-        <Item data={items.list[index]} click={favorite}/>
-      </ListGroup.Item>
-      {index === items.list.length - 1 && items.list.length !== items.count &&
+  const RowComponent = () => (
+    <div className={styles.row}>
+      <Row>
+        {items.list.map((item, i) => (
+          <Col key={i} md={4}>
+            <div style={{marginTop: '20px'}}>
+              <Item data={item} favorite={favorite} comment={comment} clickP={clickP}/>
+            </div>
+          </Col>
+        ))}
+      </Row>
+      {items.list.length !== items.count &&
         <div onClick={() => searchMore()} className={styles.more}>
           <Button variant="secondary" type="button">load more</Button>
         </div>}
@@ -128,7 +137,7 @@ const VirtualList: React.FC = () => {
   };
   return (
     <div className={styles.view}>
-      <Row className="d-flex justify-content-between align-items-center" style={{paddingLeft: "15px", height: "50px"}}>
+      <Row className="d-flex justify-content-between align-items-center" style={{height: "50px"}}>
         <Col md={3}>
           <InputGroup>
             <Form.Control placeholder="dog name" value={searchName}
@@ -142,25 +151,20 @@ const VirtualList: React.FC = () => {
           </InputGroup>
         </Col>
       </Row>
-      <List
-        height={window.innerHeight - 150}
-        itemCount={items.list.length}
-        itemSize={180}
-        width={'100%'}
-      >
-        {({index, style}) => <RowComponent index={index} style={style}/>}
-      </List>
+      {items.list.length === 0 ?
+        <NoDataPage/> :
+        <RowComponent/>
+      }
       <Modal show={showModal} size={"xl"} onHide={() => setShowModal(false)}>
         <div style={{padding: "20px"}}>
-          {currentItem && <Item data={currentItem} showNum={false} click={favorite}/>}
           <Form style={{marginTop: "10px"}}>
             <Form.Group controlId="formComment" className="mb-3">
-              <Form.Label>leave a comment</Form.Label>
+              <Form.Label>Leave a comment</Form.Label>
               <Form.Control as="textarea" rows={3} value={newComment} onChange={handleCommentChange}/>
             </Form.Group>
-            <div className="d-flex justify-content-center">
+            <div className="d-grid gap-2 d-md-flex justify-content-md-center justify-content-center">
               <Button variant="primary" onClick={handleCommentSubmit}>
-                submit
+                Submit
               </Button>
             </div>
           </Form>

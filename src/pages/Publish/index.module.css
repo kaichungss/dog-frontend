@@ -19,3 +19,10 @@ tr td > div {
   overflow: scroll;
   word-break: break-all;
 }
+
+.item {
+  padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}

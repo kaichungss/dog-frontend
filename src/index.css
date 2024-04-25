@@ -14,14 +14,14 @@ code {
   monospace;
 }
 
-::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
+/*::-webkit-scrollbar {*/
+/*  width: 0;*/
+/*  height: 0;*/
+/*}*/
 
-* {
-  scrollbar-width: none;
-}
+/** {*/
+/*  scrollbar-width: none;*/
+/*}*/
 
 table {
   height: 10px

@@ -13,7 +13,7 @@ export interface CommentInsertResult {
   insertId: number;
 }
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 6;
 // home page information interface
 export const list = async (currentPage: number, searchName: string) => {
   return await httpPost<ListData>(URI + "list", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});

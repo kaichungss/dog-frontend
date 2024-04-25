@@ -1,0 +1,41 @@
+.sent-message {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+}
+
+.name {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #b2b2b2;
+  border-radius: 50%;
+  margin: 0 10px;
+}
+
+.message {
+  max-width: 50vw;
+  font-size: 14px;
+}
+
+.sent-message .message .time {
+  text-align: end;
+}
+
+.sent-message .message h5 {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.received-message {
+  display: flex;
+  align-items: center;
+}
+
+.received-message .message .time {
+  text-align: start;
+}
+
+

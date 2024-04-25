@@ -3,23 +3,22 @@ import { Button, Form, InputGroup } from 'react-bootstrap';
 import Box from '../../components/Box';
 import styles from "./index.module.css";
 import { useNavigate } from 'react-router-dom';
-import { registerCode, registerInsert } from "../../api/register";
+import { ORG, orgName, registerInsert } from "../../api/register";
 
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  // countdown
-  const time = 60;
-  const [seconds, setSeconds] = useState<number>(time);
-  const [disabled, setDisabled] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     code: '',
-    role: 'public'
+    role: 'public',
+    org_id: -1
   });
+
+  const [orgList, setOrgList] = useState<ORG[]>([]);
   const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
     const {name, value} = e.target;
     setFormData({
@@ -27,7 +26,6 @@ const Register: React.FC = () => {
       [name]: value
     });
   };
-  // identity switching
   const handleCheckboxChange = (e: { target: { name: any; checked: any; }; }) => {
     const {name, checked} = e.target;
     const role = checked ? 'worker' : 'public';
@@ -36,42 +34,31 @@ const Register: React.FC = () => {
       [name]: role
     });
   };
-  useEffect(() => {
-    let timer: NodeJS.Timer
-    if (disabled) {
-      timer = setInterval(() => {
-        setSeconds(prevSeconds => {
-          if (prevSeconds === 1) {
-            setSeconds(time);
-            setDisabled(false);
-          }
-          return prevSeconds - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      clearInterval(timer);
-    };
-  }, [disabled]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.stopPropagation();
-    const data = await registerInsert(formData);
+    const info = {...formData}
+    if (info.role!=="worker"){
+      info.org_id=-1;
+    }
+    const data = await registerInsert(info);
     if (data) {
       navigate("/login")
-    }
-  }
-  const sendCode = async (event: FormEvent) => {
-    event.stopPropagation();
-    setDisabled(true);
-    const data = await registerCode(formData.email);
-    if (data) {
-      alert("registration code:" + data)
     }
   }
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+  useEffect(() => {
+    searchOrg()
+  }, [])
+  const searchOrg = async () => {
+    const data = await orgName();
+    if (data) {
+      setFormData({...formData, org_id: data[0].id})
+      setOrgList(data)
+    }
+  }
   return (
     <div className={styles.register}>
       <Box>
@@ -112,14 +99,24 @@ const Register: React.FC = () => {
               onChange={handleCheckboxChange}
             />
           </Form.Group>
-          {formData.role === 'worker' &&
-            <InputGroup className="mb-3">
-              <Form.Control placeholder="registration code" name="code" value={formData.code}
-                            onChange={handleInputChange}/>
-              <Button variant="outline-secondary" id="send-registration" onClick={sendCode} disabled={disabled}>
-                {disabled ? `${seconds} seconds click` : 'send'}
-              </Button>
-            </InputGroup>
+          {formData.role === 'worker' && (
+            <>
+              <Form.Group className="mb-3" controlId="formGroupOrganization">
+                <Form.Label>Organization</Form.Label>
+                <Form.Control as="select" name="org_id"
+                              onChange={handleInputChange}>
+                  {orgList.map((org, index) => (
+                    <option key={index} value={org.id}>{org.name}</option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Code</Form.Label>
+                <Form.Control placeholder="registration code" name="code" value={formData.code}
+                              onChange={handleInputChange}/>
+              </Form.Group>
+            </>
+          )
           }
           <div className="d-flex justify-content-center">
             <Button variant="primary" type="button" onClick={handleSubmit}>

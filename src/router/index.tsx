@@ -6,6 +6,8 @@ import NotFund from "../pages/Error/notFund";
 import Publish from "../pages/Publish";
 import View from "../pages/View";
 import Favorites from "../pages/Favorites";
+import Chat from "../pages/Chat";
+import Profile from "../pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +41,14 @@ const router = createBrowserRouter([
       {
         path: 'publish',
         element: <Publish/>
+      },
+      {
+        path: 'profile',
+        element: <Profile/>
+      },
+      {
+        path: 'chat',
+        element: <Chat/>
       },
       {
         path: '*',

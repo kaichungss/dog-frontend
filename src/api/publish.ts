@@ -3,17 +3,27 @@ import { httpPost } from "./request";
 export interface Item {
   id: number;
   name: string;
+  gender: string;
+  color: string;
+  size: string;
+  sterilized: string;
+  vaccinated: string;
   breed: string;
   describe: string;
-  image: string;
+  image_list: string;
 }
 
 export interface ItemList {
   id: number;
   name: string;
+  gender: string;
+  color: string;
+  size: string;
+  sterilized: string;
+  vaccinated: string;
   breed: string;
   describe: string;
-  image: string;
+  image_list: string;
   update_time: Date;
 }
 
@@ -25,10 +35,15 @@ export interface List {
 
 export const initialItem: Item = {
   id: 0,
-  name: '',
-  breed: '',
+  name: "",
+  gender: "",
+  color: "",
+  size: "",
+  sterilized: "",
+  vaccinated: "",
+  breed: 'affenpinscher',
   describe: '',
-  image: ''
+  image_list: ""
 };
 
 export const ITEMS_PER_PAGE = 5;

@@ -1,38 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, InputGroup, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Button, Carousel, Col, Form, Image, InputGroup, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import './index.module.css'
 import { deleteData, initialItem, Item, ITEMS_PER_PAGE, List, list, save } from "../../api/publish";
 import { upload } from "../../api/file";
 
-const Publish: React.FC = () => {
-  // table info
-  const [items, setItems] = useState<List>({count: 0, list: []});
-  // search input
-  const [searchName, setSearchName] = useState<string>('');
-  // add update modal
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [currentItem, setCurrentItem] = useState<Item>(initialItem);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const handleClose = (): void => {
-    setShowModal(false);
-    setCurrentItem(initialItem);
-  };
-  useEffect(() => {
-    search();
-  }, [currentPage])
-
-  const search = async () => {
-    const data = await list(currentPage, searchName);
-    if (data) {
-      setItems(data)
-    }
-  };
-  const handleShowModal = (item: Item): void => {
-    setCurrentItem(item);
-    setShowModal(true);
-  };
-
+const url = process.env.REACT_APP_BASE_URL + "/"
+const Update = ({currentItem, setCurrentItem}: { currentItem: Item, setCurrentItem: Function }) => {
+  const [imgUrl, setImgUrl] = useState<string>();
   const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
     const {name, value} = e.target;
     setCurrentItem({
@@ -40,62 +14,222 @@ const Publish: React.FC = () => {
       [name]: value
     });
   };
+  useEffect(() => {
+    if (currentItem.breed) {
+      fetch('https://dog.ceo/api/breed/' + currentItem.breed + '/images/random')
+        .then(response => response.json())
+        .then(data => setImgUrl(data.message))
+        .catch(error => console.error('Error fetching dog image:', error))
+    }
+  }, [currentItem.breed])
 
-  // save info
-  const handleSave = async () => {
-    const data = await save(currentItem);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let imageList = []
+    if (e.target.files && e.target.files.length > 0) {
+      const files = e.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const fileVal = await upload(files[i]);
+        if (fileVal) {
+          imageList.push(fileVal);
+        }
+      }
+    }
+    currentItem.image_list = imageList.join(",")
+    setCurrentItem({...currentItem})
+  };
+
+  return <Form autoComplete="off">
+    <Row>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formName" hidden={true}>
+          <Form.Control type="text" placeholder="Enter name" value={currentItem.id}/>
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="formName">
+          <Form.Label>Name</Form.Label>
+          <Form.Control type="text" placeholder="Enter name" name="name" value={currentItem.name}
+                        onChange={handleInputChange}/>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formGender">
+          <Form.Label>Gender</Form.Label>
+          <Form.Control as="select" name="gender" onChange={handleInputChange} value={currentItem.gender}>
+            <option value="dog">dog</option>
+            <option value="bitch">bitch</option>
+          </Form.Control>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formColor">
+          <Form.Label>Color</Form.Label>
+          <Form.Control type="text" placeholder="Enter Color" name="color" value={currentItem.color}
+                        onChange={handleInputChange}/>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formSize">
+          <Form.Label>Size</Form.Label>
+          <Form.Control as="select" name="size" onChange={handleInputChange} value={currentItem.size}>
+            <option value="small">small</option>
+            <option value="medium">medium</option>
+            <option value="large">large</option>
+          </Form.Control>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formSterilized">
+          <Form.Label>Sterilized</Form.Label>
+          <Form.Control as="select" name="sterilized" onChange={handleInputChange}
+                        value={currentItem.sterilized}>
+            <option value="yes">yes</option>
+            <option value="no">no</option>
+          </Form.Control>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formVaccinated">
+          <Form.Label>Vaccinated</Form.Label>
+          <Form.Control as="select" name="vaccinated" onChange={handleInputChange}
+                        value={currentItem.vaccinated}>
+            <option value="yes">yes</option>
+            <option value="no">no</option>
+          </Form.Control>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formBreed">
+          <Form.Label>Breed</Form.Label>
+          <Form.Control as="select" name="breed" onChange={handleInputChange} value={currentItem.breed}>
+            <option value="affenpinscher">affenpinscher</option>
+            <option value="african">african</option>
+            <option value="airedale">airedale</option>
+            <option value="akita">akita</option>
+            <option value="appenzeller">appenzeller</option>
+            <option value="australian-shepherd">shepherd australian</option>
+            <option value="basenji">basenji</option>
+            <option value="beagle">beagle</option>
+            <option value="bluetick">bluetick</option>
+            <option value="borzoi">borzoi</option>
+            <option value="bouvier">bouvier</option>
+            <option value="boxer">boxer</option>
+            <option value="brabancon">brabancon</option>
+            <option value="briard">briard</option>
+            <option value="buhund-norwegian">norwegian buhund</option>
+            <option value="bulldog-boston">boston bulldog</option>
+            <option value="bulldog-english">english bulldog</option>
+            <option value="bulldog-french">french bulldog</option>
+            <option value="bullterrier-staffordshire">staffordshire bullterrier</option>
+            <option value="cattledog-australian">australian cattledog</option>
+            <option value="chihuahua">chihuahua</option>
+          </Form.Control>
+        </Form.Group>
+      </Col>
+      <Col md={3}>
+        <Image src={imgUrl} rounded style={{width: "100%"}} alt={imgUrl}/>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Upload Multiple Image</Form.Label>
+          <Form.Control type="file" accept="image/*" multiple onChange={handleFileChange}/>
+        </Form.Group>
+      </Col>
+      <Col md={3}>
+        <Carousel>
+          {currentItem.image_list && currentItem.image_list.split(",").map((item, index) => {
+            return <Carousel.Item key={index}>
+              <img src={url + item} alt={item} style={{width: "100%", height: "150px"}}/>
+            </Carousel.Item>
+          })}
+        </Carousel>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3" controlId="formDescription">
+          <Form.Label>Description</Form.Label>
+          <Form.Control as="textarea" rows={3} placeholder="Enter description" name="describe"
+                        value={currentItem.describe} onChange={handleInputChange}/>
+        </Form.Group>
+      </Col>
+    </Row>
+  </Form>
+}
+const Publish: React.FC = () => {
+  const [items, setItems] = useState<List>({count: 0, list: []});
+  const [searchName, setSearchName] = useState<string>('');
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentItem, setCurrentItem] = useState<Item>();
+
+  const handleClose = (): void => {
+    setShowModal(false);
+    setCurrentItem(initialItem);
+  };
+  useEffect(() => {
+    search(currentPage);
+  }, [currentPage])
+
+  const search = async (page: number) => {
+    setCurrentPage(page)
+    const data = await list(page, searchName);
     if (data) {
-      window.location.reload();
+      setItems(data)
+    }
+    setShowModal(false)
+  };
+  const handleShowModal = (item: Item): void => {
+    setCurrentItem({...item});
+    setShowModal(true);
+  };
+
+  const handleSave = async () => {
+    if (!currentItem) {
+      return;
+    }
+    const data = await save(currentItem);
+    setCurrentPage(1)
+    if (data) {
+      search(currentPage)
     }
   }
 
-  // delete data
   const handleDelete = async (id: number) => {
     await deleteData(id);
-    window.location.reload();
+    let page = currentPage;
+    if (items.list.length === 1) {
+      page -= 1
+    }
+    if (page > 0) {
+      setCurrentPage(page)
+      search(page)
+    }
   };
 
-  // pagination
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
-  // upload the file
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const fileVal = await upload(file);
-      if (fileVal) {
-        currentItem.image = fileVal;
-        setCurrentItem(currentItem)
-      }
-    }
-  };
+
 
   return (
-    <div className="view  mt-3" style={{paddingLeft: "20px"}}>
+    <div className="view mt-3" style={{paddingLeft: "20px"}}>
       <Row className="d-flex justify-content-between align-items-center">
-        <Col md={3} className="mb-3">
+        <Col xs={12} md={6} lg={3} className="mb-3">
           <InputGroup>
-            <Form.Control placeholder="dog name" value={searchName}
-                          onChange={(e: { target: { name: string; value: string; }; }) => {
-                            setSearchName(e.target.value)
-                          }}/>
-            <Button variant="outline-secondary" id="button-addon2" onClick={search}>
-              search
+            <Form.Control placeholder="Dog name" value={searchName} onChange={(e) => setSearchName(e.target.value)}/>
+            <Button variant="outline-secondary" id="button-addon2" onClick={() => search(1)}>
+              Search
             </Button>
           </InputGroup>
         </Col>
-        <Col md={2} className="text-right">
+        <Col xs={12} md={6} lg={2} className="text-md-right mb-3">
           <Button onClick={() => handleShowModal(initialItem)}>Add</Button>
         </Col>
       </Row>
-      <Table striped bordered hover>
+      <Table striped bordered hover responsive>
         <thead>
         <tr>
           <th>Name</th>
           <th>Breed</th>
-          <th>Describe</th>
+          <th>Description</th>
           <th>Image</th>
           <th>Actions</th>
         </tr>
@@ -103,27 +237,25 @@ const Publish: React.FC = () => {
         <tbody>
         {items.list.map((item) => (
           <tr key={item.id}>
+            <td>{item.name}</td>
+            <td>{item.breed}</td>
+            <td>{item.describe}</td>
             <td>
-              <div>{item.name}</div>
+              <Carousel>
+                {item.image_list.split(",").map((item, index) => {
+                  return <Carousel.Item key={index}>
+                    <img src={url + item} alt={item} style={{width: "40%"}}/>
+                  </Carousel.Item>
+                })}
+              </Carousel>
             </td>
             <td>
-              <div>{item.breed}</div>
-            </td>
-            <td>
-              <div>{item.describe}</div>
-            </td>
-            <td><img src={process.env.REACT_APP_BASE_URL + '/' + item.image} alt={item.name} style={{width: "40px"}}/>
-            </td>
-            <td>
-              <Button variant="primary" onClick={() => handleShowModal(item)}>
-                Edit
-              </Button>
-              <Button variant="danger" onClick={() => handleDelete(item.id)}>
-                Delete
-              </Button>
+              <Button variant="primary" onClick={() => handleShowModal(item)}>Edit</Button>
+              <Button variant="danger" onClick={() => handleDelete(item.id)}>Delete</Button>
             </td>
           </tr>
-        ))}
+        ))
+        }
         </tbody>
       </Table>
 
@@ -134,48 +266,23 @@ const Publish: React.FC = () => {
           </Pagination.Item>
         ))}
       </Pagination>
-
-      <Modal show={showModal} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>{currentItem.id ? 'Edit' : 'Add'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form autoComplete="off">
-            <Form.Group className="mb-3" controlId="formName" hidden={true}>
-              <Form.Control type="text" placeholder="Enter name" value={currentItem.id}/>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formName">
-              <Form.Label>Name</Form.Label>
-              <Form.Control type="text" placeholder="Enter name" name="name"
-                            value={currentItem.name} onChange={handleInputChange}/>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formName">
-              <Form.Label>Breed</Form.Label>
-              <Form.Control type="text" placeholder="Enter Breed" name="breed"
-                            value={currentItem.breed} onChange={handleInputChange}/>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formDescription">
-              <Form.Label>describe</Form.Label>
-              <Form.Control as="textarea" rows={3} placeholder="Enter describe" name="describe"
-                            value={currentItem.describe} onChange={handleInputChange}/>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Default file input example</Form.Label>
-              <Form.Control type="file" accept="image/*" onChange={handleFileChange}/>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {showModal &&
+        <Modal show={showModal} onHide={handleClose} centered size={"xl"}>
+          <Modal.Header closeButton>
+            <Modal.Title>{currentItem?.id ? 'Edit' : 'Add'}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {currentItem && <Update currentItem={currentItem} setCurrentItem={setCurrentItem}/>}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>Close</Button>
+            <Button variant="primary" onClick={handleSave}>Save changes</Button>
+          </Modal.Footer>
+        </Modal>
+      }
     </div>
   );
+
 };
 
 export default Publish;
