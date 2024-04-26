@@ -72,7 +72,7 @@ const ChatMessage: React.FC<{ u: User }> = ({u}) => {
           <Form className="mt-3 text-center" style={{paddingBottom: "10px"}}>
             <Form.Control
               as="textarea" rows={3}
-              placeholder="Type your message..."
+              placeholder="type your message..."
               value={newMessage}
               onChange={e => setNewMessage(e.target.value)}
             />

@@ -46,8 +46,7 @@ export const initialItem: Item = {
   image_list: ""
 };
 
-export const ITEMS_PER_PAGE = 5;
-// Dog information is added, deleted, modified, and checked
+export const ITEMS_PER_PAGE = 6;
 const URI = "/system/publish/";
 
 export const list = async (currentPage: number, searchName: string) => {

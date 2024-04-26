@@ -3,11 +3,13 @@
 }
 
 .navbar {
-  padding-left: 10px;
+  padding-left: 5vw;
+  padding-right: 5vw;
 }
 
 .out {
   height: calc(100% - 60px);
   overflow: scroll;
   word-break: break-all;
+  padding: 0 5vw;
 }

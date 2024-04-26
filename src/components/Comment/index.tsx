@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./index.module.css";
 import { getTimeAgo } from "../../util/utils";
-import { Button } from "react-bootstrap";
+import del from "../../assets/del.png";
 
 export interface CommentData {
   id: number;
@@ -23,7 +23,8 @@ const Comment: React.FC<{ data: CommentData, click: Function }> = ({data, click}
       </div>
       {localStorage.getItem("role") === 'worker' &&
         <div className={styles.right}>
-          <Button variant="danger" onClick={() => click(data.id)}>Delete</Button>
+          <div onClick={() => click(data.id)}><img style={{height: "20px"}} src={del} alt=""/>
+          </div>
         </div>
       }
     </div>

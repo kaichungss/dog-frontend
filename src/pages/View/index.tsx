@@ -1,30 +1,46 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Button, Col, Form, InputGroup, ListGroup, Modal, Row } from 'react-bootstrap';
-import Item, { ItemData } from "../../components/Item";
-import Comment, { CommentData } from "../../components/Comment";
+import { Button, Col, Dropdown, Form, Row } from 'react-bootstrap';
+import Item from "../../components/Item";
 import styles from "./index.module.css";
-import { addComment, clickData, commentList, deleteComment, list, ListData, moreList } from '../../api/view';
+import { clickData, list, ListData, moreList } from '../../api/view';
 import { addFavorites } from '../../api/favorites';
 import NoDataPage from "../../components/NoDataPage";
 
+const RowComponent = ({
+                        items,
+                        favorite,
+                        clickP, searchMore
+                      }: { items: ListData, favorite: Function, clickP: Function, searchMore: Function }) => (
+  <div className={styles.row}>
+    <Row>
+      {items.list.map((item, i) => (
+        <Col key={i} md={4}>
+          <div style={{marginTop: '20px'}}>
+            <Item data={item} favorite={favorite} clickP={clickP}/>
+          </div>
+        </Col>
+      ))}
+    </Row>
+    {items.list.length !== items.count &&
+      <div onClick={() => searchMore()} className={styles.more}>
+        <Button variant="secondary" type="button">load more</Button>
+      </div>}
+  </div>
+);
 const VirtualList: React.FC = () => {
-  // home data
   const [items, setItems] = useState<ListData>({count: 0, list: []});
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [currentItem, setCurrentItem] = useState<ItemData>();
-  // search input
   const [searchName, setSearchName] = useState<string>('');
-  const [comments, setComments] = useState<CommentData[]>([]);
-  // leave a comment
-  const [newComment, setNewComment] = useState<string>('');
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [breed, setBreed] = useState<string[]>([]);
+  const [size, setSize] = useState<string[]>([]);
+
   useEffect(() => {
     search();
   }, [])
 
   const search = async () => {
     setCurrentPage(1);
-    const data = await list(1, searchName);
+    const data = await list(1, searchName, size, breed);
     if (data) {
       setItems(data)
     }
@@ -32,7 +48,7 @@ const VirtualList: React.FC = () => {
 
   const searchMore = async () => {
     setCurrentPage(currentPage + 1);
-    const data = await moreList(currentPage + 1, searchName);
+    const data = await moreList(currentPage + 1, searchName, size, breed);
     if (data) {
       setItems({count: items.count, list: items.list.concat(data)})
     }
@@ -42,21 +58,15 @@ const VirtualList: React.FC = () => {
     items.list.map((item) => {
       if (item.id === dog_id) {
         item.click_num += 1;
-        setCurrentItem({...item, click_num: 0, comment_num: 0})
       }
       return item;
     })
     setItems(items);
     await clickData(dog_id);
+    window.open('/system/detail/' + dog_id, '_blank');
   };
 
-  const comment = async (dog_id: number) => {
-    setShowModal(true)
-    const commentData = await commentList(dog_id)
-    if (commentData != null) {
-      setComments(commentData);
-    }
-  };
+
   const favorite = async (e: FormEvent, f: boolean, dog_id: number) => {
     e.stopPropagation();
     items.list.map((item) => {
@@ -66,7 +76,6 @@ const VirtualList: React.FC = () => {
         } else {
           item.is_collected = 0;
         }
-        setCurrentItem({...item})
       }
       return item;
     })
@@ -74,107 +83,102 @@ const VirtualList: React.FC = () => {
     await addFavorites(f, dog_id);
   }
 
-  const RowComponent = () => (
-    <div className={styles.row}>
-      <Row>
-        {items.list.map((item, i) => (
-          <Col key={i} md={4}>
-            <div style={{marginTop: '20px'}}>
-              <Item data={item} favorite={favorite} comment={comment} clickP={clickP}/>
-            </div>
-          </Col>
-        ))}
-      </Row>
-      {items.list.length !== items.count &&
-        <div onClick={() => searchMore()} className={styles.more}>
-          <Button variant="secondary" type="button">load more</Button>
-        </div>}
-    </div>
-  );
-  const handleCommentSubmit = async () => {
-    if (newComment.trim() !== '') {
-      items.list.map((item) => {
-        if (item.id === currentItem?.id) {
-          item.comment_num += 1;
-        }
-        return item;
-      })
-      setItems(items);
-      setNewComment('');
-      const data = await addComment(currentItem?.id || 0, newComment);
-      if (data) {
-        comments.unshift({
-          id: data.insertId,
-          comment: newComment,
-          username: localStorage.getItem("username") || '',
-          insert_time: new Date()
-        })
-        setComments([...comments]);
-      }
+  const sizeDropdownChange = (event: { target: { value: any; checked: any; }; }) => {
+    const {value, checked} = event.target;
+    if (checked) {
+      setSize([value]);
+    } else {
+      setSize(size.filter((option) => option !== value));
     }
   };
-
-  const handleCommentDelete = async (id: number) => {
-    items.list.map((item) => {
-      if (item.id === currentItem?.id) {
-        item.comment_num -= 1;
-      }
-      return item;
-    })
-    setItems(items);
-    await deleteComment(id);
-    setComments(comments.filter((item) => {
-      return item.id !== id
-    }));
-  };
-  const handleCommentChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
-    setNewComment(e.target.value);
-  };
-  const handleKeyDown = (event: { key: string; }) => {
-    if (event.key === 'Enter') {
-      search()
+  const breedDropdownChange = (event: { target: { value: any; checked: any; }; }) => {
+    const {value, checked} = event.target;
+    if (checked) {
+      setBreed([value]);
+    } else {
+      setBreed(breed.filter((option) => option !== value));
     }
   };
   return (
     <div className={styles.view}>
-      <Row className="d-flex justify-content-between align-items-center" style={{height: "50px"}}>
+      <Row >
         <Col md={3}>
-          <InputGroup>
-            <Form.Control placeholder="dog name" value={searchName}
-                          onKeyDown={handleKeyDown}
-                          onChange={(e: { target: { name: string; value: string; }; }) => {
-                            setSearchName(e.target.value)
-                          }}/>
-            <Button variant="outline-secondary" id="button-addon2" onClick={search}>
-              search
-            </Button>
-          </InputGroup>
+          <Form.Control placeholder="dog name" value={searchName}
+                        onChange={(e: { target: { name: string; value: string; }; }) => {
+                          setSearchName(e.target.value)
+                        }}/>
+        </Col>
+        <Col md={4} className="d-flex justify-content-around align-items-center">
+          <Dropdown>
+            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+              Select Size
+            </Dropdown.Toggle>
+            <Dropdown.Menu style={{maxHeight: '200px', overflowY: 'auto'}}>
+              <Form>
+                {['small', 'medium', 'large'].map((option) => (
+                  <Form.Check
+                    key={option}
+                    type="checkbox"
+                    label={option}
+                    value={option}
+                    onChange={sizeDropdownChange}
+                  />
+                ))}
+              </Form>
+            </Dropdown.Menu>
+          </Dropdown>
+
+          <Dropdown>
+            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+              Select Breed
+            </Dropdown.Toggle>
+            <Dropdown.Menu style={{maxHeight: '200px', overflowY: 'auto'}}>
+              <Form>
+                {[
+                  "affenpinscher",
+                  "african",
+                  "airedale",
+                  "akita",
+                  "appenzeller",
+                  "australian-shepherd",
+                  "basenji",
+                  "beagle",
+                  "bluetick",
+                  "borzoi",
+                  "bouvier",
+                  "boxer",
+                  "brabancon",
+                  "briard",
+                  "buhund-norwegian",
+                  "bulldog-boston",
+                  "bulldog-english",
+                  "bulldog-french",
+                  "bullterrier-staffordshire",
+                  "cattledog-australian",
+                  "chihuahua"
+                ].map((option) => (
+                  <Form.Check
+                    key={option}
+                    type="checkbox"
+                    label={option}
+                    value={option}
+                    onChange={breedDropdownChange}
+                  />
+                ))}
+              </Form>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Col>
+        <Col md={2}>
+          <Button variant="outline-secondary" id="button-addon2" onClick={search}>
+            search
+          </Button>
         </Col>
       </Row>
       {items.list.length === 0 ?
         <NoDataPage/> :
-        <RowComponent/>
+        <RowComponent items={items} favorite={favorite} clickP={clickP} searchMore={searchMore}/>
       }
-      <Modal show={showModal} size={"xl"} onHide={() => setShowModal(false)}>
-        <div style={{padding: "20px"}}>
-          <Form style={{marginTop: "10px"}}>
-            <Form.Group controlId="formComment" className="mb-3">
-              <Form.Label>Leave a comment</Form.Label>
-              <Form.Control as="textarea" rows={3} value={newComment} onChange={handleCommentChange}/>
-            </Form.Group>
-            <div className="d-grid gap-2 d-md-flex justify-content-md-center justify-content-center">
-              <Button variant="primary" onClick={handleCommentSubmit}>
-                Submit
-              </Button>
-            </div>
-          </Form>
-          <ListGroup>
-            {comments.map((comment, index) => (
-              <Comment data={comment} click={handleCommentDelete} key={index}/>
-            ))}
-          </ListGroup>
-        </div>
-      </Modal>
     </div>
   );
 };

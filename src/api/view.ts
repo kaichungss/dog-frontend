@@ -14,13 +14,21 @@ export interface CommentInsertResult {
 }
 
 const ITEMS_PER_PAGE = 6;
-// home page information interface
-export const list = async (currentPage: number, searchName: string) => {
-  return await httpPost<ListData>(URI + "list", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});
+export const list = async (currentPage: number, searchName: string, size: string[], breed: string[]) => {
+  return await httpPost<ListData>(URI + "list", {currentPage, limit: ITEMS_PER_PAGE, name: searchName, size, breed});
+};
+export const detail = async (id: number) => {
+  return await httpPost<ItemData[]>(URI + "detail", {id});
 };
 
-export const moreList = async (currentPage: number, searchName: string) => {
-  return await httpPost<ItemData>(URI + "moreList", {currentPage, limit: ITEMS_PER_PAGE, name: searchName});
+export const moreList = async (currentPage: number, searchName: string, size: string[], breed: string[]) => {
+  return await httpPost<ItemData>(URI + "moreList", {
+    currentPage,
+    limit: ITEMS_PER_PAGE,
+    name: searchName,
+    size,
+    breed
+  });
 };
 
 export const clickData = async (dog_id: number) => {

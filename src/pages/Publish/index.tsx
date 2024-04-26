@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Carousel, Col, Form, Image, InputGroup, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Button, Carousel, Col, Form, Image, InputGroup, Modal, Row } from 'react-bootstrap';
 import './index.module.css'
-import { deleteData, initialItem, Item, ITEMS_PER_PAGE, List, list, save } from "../../api/publish";
+import { deleteData, initialItem, Item, List, list, save } from "../../api/publish";
 import { upload } from "../../api/file";
+import NoDataPage from "../../components/NoDataPage";
+import styles from "../View/index.module.css";
+import UpdateItem from "../../components/PubItem";
 
 const url = process.env.REACT_APP_BASE_URL + "/"
 const Update = ({currentItem, setCurrentItem}: { currentItem: Item, setCurrentItem: Function }) => {
@@ -33,6 +36,9 @@ const Update = ({currentItem, setCurrentItem}: { currentItem: Item, setCurrentIt
           imageList.push(fileVal);
         }
       }
+    }
+    if (imageList.length === 0) {
+      return;
     }
     currentItem.image_list = imageList.join(",")
     setCurrentItem({...currentItem})
@@ -152,6 +158,30 @@ const Update = ({currentItem, setCurrentItem}: { currentItem: Item, setCurrentIt
     </Row>
   </Form>
 }
+
+const RowComponent = ({
+                        items,
+                        handleShowModal,
+                        handleDelete, searchMore
+                      }: { items: List, handleShowModal: Function, handleDelete: Function, searchMore: Function }) => {
+  return (<div className={styles.row}>
+    <Row>
+      {items.list.map((item, i) => (
+        <Col key={i} md={4}>
+          <div style={{marginTop: '20px'}}>
+            <UpdateItem data={item} editEvent={() => {
+              handleShowModal(item)
+            }} delEvent={handleDelete}/>
+          </div>
+        </Col>
+      ))}
+    </Row>
+    {items.list.length !== items.count &&
+      <div onClick={() => searchMore()} className={styles.more}>
+        <Button variant="secondary" type="button">load more</Button>
+      </div>}
+  </div>)
+};
 const Publish: React.FC = () => {
   const [items, setItems] = useState<List>({count: 0, list: []});
   const [searchName, setSearchName] = useState<string>('');
@@ -165,7 +195,7 @@ const Publish: React.FC = () => {
   };
   useEffect(() => {
     search(currentPage);
-  }, [currentPage])
+  }, [])
 
   const search = async (page: number) => {
     setCurrentPage(page)
@@ -185,28 +215,25 @@ const Publish: React.FC = () => {
       return;
     }
     const data = await save(currentItem);
-    setCurrentPage(1)
     if (data) {
-      search(currentPage)
+      setCurrentPage(1)
+      search(1)
     }
   }
 
   const handleDelete = async (id: number) => {
     await deleteData(id);
-    let page = currentPage;
-    if (items.list.length === 1) {
-      page -= 1
-    }
-    if (page > 0) {
-      setCurrentPage(page)
-      search(page)
-    }
+    setCurrentPage(1)
+    search(1)
   };
 
-  const paginate = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
+  const searchMore = async () => {
+    setCurrentPage(currentPage + 1);
+    const data = await list(currentPage + 1, searchName);
+    if (data) {
+      setItems({count: data.count, list: items.list.concat(data.list)})
+    }
   };
-
 
 
   return (
@@ -224,48 +251,11 @@ const Publish: React.FC = () => {
           <Button onClick={() => handleShowModal(initialItem)}>Add</Button>
         </Col>
       </Row>
-      <Table striped bordered hover responsive>
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th>Breed</th>
-          <th>Description</th>
-          <th>Image</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {items.list.map((item) => (
-          <tr key={item.id}>
-            <td>{item.name}</td>
-            <td>{item.breed}</td>
-            <td>{item.describe}</td>
-            <td>
-              <Carousel>
-                {item.image_list.split(",").map((item, index) => {
-                  return <Carousel.Item key={index}>
-                    <img src={url + item} alt={item} style={{width: "40%"}}/>
-                  </Carousel.Item>
-                })}
-              </Carousel>
-            </td>
-            <td>
-              <Button variant="primary" onClick={() => handleShowModal(item)}>Edit</Button>
-              <Button variant="danger" onClick={() => handleDelete(item.id)}>Delete</Button>
-            </td>
-          </tr>
-        ))
-        }
-        </tbody>
-      </Table>
-
-      <Pagination>
-        {Array.from({length: Math.ceil(items.count / ITEMS_PER_PAGE)}).map((_, index) => (
-          <Pagination.Item key={index + 1} active={index + 1 === currentPage} onClick={() => paginate(index + 1)}>
-            {index + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
+      {items.list.length === 0 ?
+        <NoDataPage/> :
+        <RowComponent items={items} handleShowModal={handleShowModal} handleDelete={handleDelete}
+                      searchMore={searchMore}/>
+      }
       {showModal &&
         <Modal show={showModal} onHide={handleClose} centered size={"xl"}>
           <Modal.Header closeButton>

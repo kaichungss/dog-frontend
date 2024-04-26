@@ -1,10 +1,6 @@
 import React from "react";
 import styles from "./index.module.css";
 import { Carousel } from 'react-bootstrap';
-import com from "../../assets/com.png"
-import clickp from "../../assets/cilck.png"
-import red from "../../assets/red-heart.png"
-import grey from "../../assets/grey-heart.png"
 
 export interface ItemData {
   id: number;
@@ -26,33 +22,13 @@ export interface ItemData {
 
 interface Params {
   data: ItemData,
-  favorite: Function,
-  clickP: Function
 }
 
 const url = process.env.REACT_APP_BASE_URL + "/";
-const View: React.FC<{
-  data: ItemData,
-  favorite: Function,
-}> = ({data, favorite}) => {
-  return (<div className={styles.iconItem}>
-    <div className={styles.icon}>
-      <img
-        src={data.is_collected ? red : grey}
-        onClick={(e) => favorite(e, !data.is_collected, data.id)}
-        alt=""
-      />
-    </div>
-    <div className={styles.icon}><img src={com} alt=""/>{data.comment_num}
-    </div>
-    <div className={styles.icon}><img src={clickp} alt=""/>{data.click_num}
-    </div>
-  </div>)
-}
-const Item: React.FC<Params> = ({data, favorite, clickP}) => {
+const DetailItem: React.FC<Params> = ({data}) => {
   return (
-    <div className={styles.item} onClick={() => clickP(data.id)}>
-      <div>
+    <div className={styles.item}>
+      <div className={styles.img}>
         <Carousel>
           <Carousel>
             {data.image_list.split(",").map((item, index) => {
@@ -77,9 +53,8 @@ const Item: React.FC<Params> = ({data, favorite, clickP}) => {
           <div>Creation Time：{new Date(data.update_time).toLocaleString()}</div>
         </div>
       </div>
-      <View data={data} favorite={favorite}/>
     </div>
   );
 };
 
-export default Item;
+export default DetailItem;

@@ -8,6 +8,7 @@ import View from "../pages/View";
 import Favorites from "../pages/Favorites";
 import Chat from "../pages/Chat";
 import Profile from "../pages/Profile";
+import DetailPage from "../pages/Detail";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: 'publish',
         element: <Publish/>
+      },
+      {
+        path: 'detail/:id',
+        element: <DetailPage/>
       },
       {
         path: 'profile',

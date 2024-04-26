@@ -3,6 +3,7 @@ import { Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 import styles from "./index.module.css";
 import { User, userList } from "../../api/chatinfo";
 import ChatMessage from "./message";
+import NoDataPage from "../../components/NoDataPage";
 
 
 
@@ -42,20 +43,22 @@ const ChatApp: React.FC = () => {
           </InputGroup>
         </Col>
       </Row>
-      <Row>
-        {users.map(u => (
-          <Col md={2}>
-            <div key={u.id}
-                 className={styles['received-message']} style={{margin: "10px", cursor: "pointer"}}
-                 onClick={() => showChat(u)}>
-              <div className={styles.name}>
-                {u.username?.charAt(0).toUpperCase()}
+      {users.length === 0 ? <NoDataPage/> :
+        <Row>
+          {users.map(u => (
+            <Col md={2}>
+              <div key={u.id}
+                   className={styles['received-message']} style={{margin: "10px", cursor: "pointer"}}
+                   onClick={() => showChat(u)}>
+                <div className={styles.name}>
+                  {u.username?.charAt(0).toUpperCase()}
+                </div>
+                <b>{u.username}</b>
               </div>
-              <b>{u.username}</b>
-            </div>
-          </Col>
-        ))}
-      </Row>
+            </Col>
+          ))}
+        </Row>
+      }
       {showModal &&
         <Modal show={showModal} size={"xl"} onHide={() => setShowModal(false)} centered>
           {user && <ChatMessage u={user}/>}
