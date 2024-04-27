@@ -33,14 +33,12 @@ const UpdateItem: React.FC<Params> = ({data, editEvent, delEvent}) => {
   return (
     <div className={styles.item}>
       <div>
-        <Carousel>
-          <Carousel>
-            {data.image_list.split(",").map((item, index) => {
-              return <Carousel.Item key={index}>
-                <img src={url + item} alt={item}/>
-              </Carousel.Item>
-            })}
-          </Carousel>
+        <Carousel onClick={(e) => e.stopPropagation()}>
+          {data.image_list.split(",").map((item, index) => {
+            return <Carousel.Item key={index}>
+              <img src={url + item} alt={item}/>
+            </Carousel.Item>
+          })}
         </Carousel>
       </div>
       <div>

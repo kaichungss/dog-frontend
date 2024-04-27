@@ -1,6 +1,7 @@
 import { httpPost } from "./request";
 import { ItemData } from "../components/Item";
 import { CommentData } from "../components/Comment";
+import { ORG } from "./register";
 
 const URI = "/system/view/";
 
@@ -46,6 +47,33 @@ export const addComment = async (dog_id: number, comment: string) => {
 export const deleteComment = async (id: number) => {
   return await httpPost<string>(URI + 'delete_comment', {id})
 };
+
+export const updateUser = async (formData: { code: string; role: string; username: string, org_id: number }) => {
+  return await httpPost<ORG[]>(URI + "updateUser", formData)
+};
+
+export const breedList = async () => {
+  let list: string[] = [];
+  try {
+    const response = await fetch('https://dog.ceo/api/breeds/list/all');
+    const data = await response.json();
+    const message = data.message;
+    for (const messageKey in message) {
+      const messageElement = message[messageKey];
+      if (messageElement.length > 0) {
+        for (let i = 0; i < messageElement.length; i++) {
+          list.push(messageElement[i] + " " + messageKey);
+        }
+      } else {
+        list.push(messageKey);
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching dog image:', error);
+  }
+  return list;
+};
+
 
 
 

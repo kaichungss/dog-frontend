@@ -10,7 +10,7 @@ interface Token {
   id: string;
   username: string;
   role: string;
-  org_name: string;
+  org_id: string;
   email: string;
 }
 
@@ -41,7 +41,7 @@ const Login: React.FC = () => {
       localStorage.setItem("username", data.username);
       localStorage.setItem("role", data.role);
       localStorage.setItem("id", data.id);
-      localStorage.setItem("org_name", data.org_name);
+      localStorage.setItem("org_id", data.org_id);
       localStorage.setItem("email", data.email);
       navigate("/system")
     }

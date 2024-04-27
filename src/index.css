@@ -26,7 +26,10 @@ code {
 table {
   height: 10px
 }
-.col-md-1 {
-  padding: 2px;
-  margin: 0 10px;
+
+.search >div{
+  margin: 4px 0;
+}
+.col-md-1{
+  width: max-content!important;
 }

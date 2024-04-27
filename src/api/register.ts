@@ -17,3 +17,4 @@ export const registerInsert = async (formData: { password: string; code: string;
 export const orgName = async () => {
   return await httpPost<ORG[]>(URI + "orgName", {})
 };
+

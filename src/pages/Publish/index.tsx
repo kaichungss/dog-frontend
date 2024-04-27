@@ -6,10 +6,20 @@ import { upload } from "../../api/file";
 import NoDataPage from "../../components/NoDataPage";
 import styles from "../View/index.module.css";
 import UpdateItem from "../../components/PubItem";
+import { breedList } from "../../api/view";
 
 const url = process.env.REACT_APP_BASE_URL + "/"
 const Update = ({currentItem, setCurrentItem}: { currentItem: Item, setCurrentItem: Function }) => {
   const [imgUrl, setImgUrl] = useState<string>();
+  const [breeds, setBreeds] = useState<string[]>([])
+  useEffect(() => {
+    breed_list()
+  }, [])
+
+  const breed_list = async () => {
+    const data = await breedList();
+    setBreeds(data);
+  };
   const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
     const {name, value} = e.target;
     setCurrentItem({
@@ -18,8 +28,13 @@ const Update = ({currentItem, setCurrentItem}: { currentItem: Item, setCurrentIt
     });
   };
   useEffect(() => {
+    let b = currentItem.breed;
+    const breed = currentItem.breed.split(" ");
+    if (breed.length > 1) {
+      b = breed.reverse().join('/')
+    }
     if (currentItem.breed) {
-      fetch('https://dog.ceo/api/breed/' + currentItem.breed + '/images/random')
+      fetch('https://dog.ceo/api/breed/' + b + '/images/random')
         .then(response => response.json())
         .then(data => setImgUrl(data.message))
         .catch(error => console.error('Error fetching dog image:', error))
@@ -106,27 +121,9 @@ const Update = ({currentItem, setCurrentItem}: { currentItem: Item, setCurrentIt
         <Form.Group className="mb-3" controlId="formBreed">
           <Form.Label>Breed</Form.Label>
           <Form.Control as="select" name="breed" onChange={handleInputChange} value={currentItem.breed}>
-            <option value="affenpinscher">affenpinscher</option>
-            <option value="african">african</option>
-            <option value="airedale">airedale</option>
-            <option value="akita">akita</option>
-            <option value="appenzeller">appenzeller</option>
-            <option value="australian-shepherd">shepherd australian</option>
-            <option value="basenji">basenji</option>
-            <option value="beagle">beagle</option>
-            <option value="bluetick">bluetick</option>
-            <option value="borzoi">borzoi</option>
-            <option value="bouvier">bouvier</option>
-            <option value="boxer">boxer</option>
-            <option value="brabancon">brabancon</option>
-            <option value="briard">briard</option>
-            <option value="buhund-norwegian">norwegian buhund</option>
-            <option value="bulldog-boston">boston bulldog</option>
-            <option value="bulldog-english">english bulldog</option>
-            <option value="bulldog-french">french bulldog</option>
-            <option value="bullterrier-staffordshire">staffordshire bullterrier</option>
-            <option value="cattledog-australian">australian cattledog</option>
-            <option value="chihuahua">chihuahua</option>
+            {breeds.map((val, i) => {
+              return <option value={val} key={i}>{val}</option>;
+            })}
           </Form.Control>
         </Form.Group>
       </Col>

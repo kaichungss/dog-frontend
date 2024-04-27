@@ -53,14 +53,12 @@ const Item: React.FC<Params> = ({data, favorite, clickP}) => {
   return (
     <div className={styles.item} onClick={() => clickP(data.id)}>
       <div>
-        <Carousel>
-          <Carousel>
-            {data.image_list.split(",").map((item, index) => {
-              return <Carousel.Item key={index}>
-                <img src={url + item} alt={item}/>
-              </Carousel.Item>
-            })}
-          </Carousel>
+        <Carousel onClick={(e) => e.stopPropagation()}>
+          {data.image_list.split(",").map((item, index) => {
+            return <Carousel.Item key={index}>
+              <img src={url + item} alt={item}/>
+            </Carousel.Item>
+          })}
         </Carousel>
       </div>
       <div>
