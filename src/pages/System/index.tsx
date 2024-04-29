@@ -8,7 +8,7 @@ const System: React.FC = () => {
   return (
     <div className={styles.system}>
       <Navbar bg="dark" variant="dark" expand="lg" className={styles.navbar}>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
             <Nav.Link href="/system/view" active={pathname === "/system/view"}>view</Nav.Link>

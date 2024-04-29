@@ -19,10 +19,10 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
-  if (error.response.status === 403) {
+  if (error.response?.status === 403) {
     window.location.href = '/login';
   }
-  return Promise.reject(error);
+  return {data: {code: 404, msg: error.message, data: null}};
 });
 const request = async <T>(config: AxiosRequestConfig) => {
   const {data} = await instance.request<Response<T>>(config);

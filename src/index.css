@@ -27,9 +27,10 @@ table {
   height: 10px
 }
 
-.search >div{
+.search > div {
   margin: 4px 0;
 }
-.col-md-1{
-  width: max-content!important;
+
+.col-md-1 {
+  width: max-content !important;
 }

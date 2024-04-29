@@ -38,8 +38,8 @@ const Register: React.FC = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.stopPropagation();
     const info = {...formData}
-    if (info.role!=="worker"){
-      info.org_id=-1;
+    if (info.role !== "worker") {
+      info.org_id = -1;
     }
     const data = await registerInsert(info);
     if (data) {
