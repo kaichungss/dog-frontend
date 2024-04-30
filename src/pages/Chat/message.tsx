@@ -62,7 +62,12 @@ const ChatMessage: React.FC<{ u: User }> = ({u}) => {
                 <div className={styles.message}>
                   <div className={styles.time}>{new Date(message.insert_time).toLocaleString()}</div>
                   <h5>
-                    <pre style={{marginBottom: 0, fontSize: "20px"}}>{message.text}</pre>
+                    <pre style={{
+                      marginBottom: 0,
+                      fontSize: "20px",
+                      whiteSpace: "pre-wrap",
+                      wordWrap: "break-word"
+                    }}>{message.text}</pre>
                   </h5>
                 </div>
               </div>
