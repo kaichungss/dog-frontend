@@ -16,11 +16,15 @@ const System: React.FC = () => {
             {localStorage.getItem("role") === 'worker' &&
               <Nav.Link href="/system/publish" active={pathname === "/system/publish"}>publish</Nav.Link>}
             <Nav.Link href="/system/chat" active={pathname === "/system/chat"}>chat</Nav.Link>
-            <Nav.Link href="/system/profile" active={pathname === "/system/profile"}>profile</Nav.Link>
+            {localStorage.getItem("token")
+              && <Nav.Link href="/system/profile" active={pathname === "/system/profile"}>profile</Nav.Link>
+            }
           </Nav>
+
           <Navbar.Collapse className="justify-content-end">
             <Nav className="mr-auto">
-              <Nav.Link href="/login">logout</Nav.Link>
+              <Nav.Link href="/login"> {localStorage.getItem("token") ? 'logout' : 'login'
+              }</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Navbar.Collapse>

@@ -13,7 +13,7 @@ import DetailPage from "../pages/Detail";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/login" replace/>,
+    element: <Navigate to="/system" replace/>,
   },
   {
     path: "/login",

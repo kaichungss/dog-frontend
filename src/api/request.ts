@@ -20,13 +20,14 @@ instance.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
   if (error.response?.status === 403) {
-    window.location.href = '/login';
+    localStorage.clear();
+    alert("a login is required to operate!")
   }
-  return {data: {code: 404, msg: error.message, data: null}};
+  return {data: {code: error.response?.status || 201, msg: error.message, data: null}};
 });
 const request = async <T>(config: AxiosRequestConfig) => {
   const {data} = await instance.request<Response<T>>(config);
-  if (data.code !== 200) {
+  if (data.code !== 200 && data.code !== 403) {
     alert(data.msg)
     return null;
   }
