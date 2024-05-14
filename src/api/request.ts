@@ -19,7 +19,8 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
-  if (error.response?.status === 403) {
+  console.log(error.config.url.indexOf("/click"))
+  if (error.config.url.indexOf("/click") === -1 && error.response?.status === 403) {
     localStorage.clear();
     alert("a login is required to operate!")
   }
