@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Button, Col, Dropdown, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row } from 'react-bootstrap';
 import Item from "../../components/Item";
 import styles from "./index.module.css";
 import { breedList, clickData, list, ListData, moreList } from '../../api/view';
@@ -50,7 +50,7 @@ const VirtualList: React.FC = () => {
 
   const breed_list = async () => {
     const data = await breedList();
-    setBreeds(data);
+    setBreeds(['all'].concat(data));
   };
   const searchMore = async () => {
     setCurrentPage(currentPage + 1);
@@ -89,21 +89,13 @@ const VirtualList: React.FC = () => {
     await addFavorites(f, dog_id);
   }
 
-  const sizeDropdownChange = (event: { target: { value: any; checked: any; }; }) => {
-    const {value, checked} = event.target;
-    if (checked) {
-      setSize([value]);
-    } else {
-      setSize(size.filter((option) => option !== value));
-    }
+  const sizeDropdownChange = (e: { target: { name: string; value: string; }; }) => {
+    const {value} = e.target;
+    setSize(value ? [value] : []);
   };
-  const breedDropdownChange = (event: { target: { value: any; checked: any; }; }) => {
-    const {value, checked} = event.target;
-    if (checked) {
-      setBreed([value]);
-    } else {
-      setBreed(breed.filter((option) => option !== value));
-    }
+  const breedDropdownChange = (e: { target: { name: string; value: string; }; }) => {
+    const {value} = e.target;
+    setBreed(value !== 'all' ? [value] : []);
   };
   return (
     <div className={styles.view}>
@@ -117,45 +109,20 @@ const VirtualList: React.FC = () => {
         </Form.Group>
         <Form.Group as={Col} md="1">
           <Form.Label>Size</Form.Label>
-          <Dropdown>
-            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-              Select Size
-            </Dropdown.Toggle>
-            <Dropdown.Menu style={{maxHeight: '200px', overflowY: 'auto'}}>
-              <Form>
-                {['small', 'medium', 'large'].map((option) => (
-                  <Form.Check
-                    key={option}
-                    type="checkbox"
-                    label={option}
-                    value={option}
-                    onChange={sizeDropdownChange}
-                  />
-                ))}
-              </Form>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Form.Control as="select" name="size" onChange={sizeDropdownChange}>
+            <option value="">all</option>
+            <option value="small">small</option>
+            <option value="medium">medium</option>
+            <option value="large">large</option>
+          </Form.Control>
         </Form.Group>
         <Form.Group as={Col} md="1">
           <Form.Label>Breed</Form.Label>
-          <Dropdown>
-            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-              Select Breed
-            </Dropdown.Toggle>
-            <Dropdown.Menu style={{maxHeight: '200px', overflowY: 'auto'}}>
-              <Form>
-                {breeds.map((option) => (
-                  <Form.Check
-                    key={option}
-                    type="checkbox"
-                    label={option}
-                    value={option}
-                    onChange={breedDropdownChange}
-                  />
-                ))}
-              </Form>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Form.Control as="select" name="breed" onChange={breedDropdownChange}>
+            {breeds.map((val, i) => {
+              return <option value={val} key={i}>{val}</option>;
+            })}
+          </Form.Control>
         </Form.Group>
         <Form.Group as={Col} md="2">
           <Form.Label style={{visibility: "hidden"}}>Search</Form.Label>
